@@ -1,17 +1,14 @@
 var log = require('logger')('mongutils');
 var mongoose = require('mongoose');
-var ObjectID = require('mongodb').ObjectID;
 var _ = require('lodash');
 var Schema = mongoose.Schema;
 var validators = require('validators');
 var types = validators.types;
 var values = validators.values;
 
-var public;
-
 module.exports = function (schema, options) {
     schema.virtual('id').get(function () {
-        return this._id;
+        return String(this._id);
     });
 
     schema.set('toJSON', {
@@ -27,28 +24,6 @@ module.exports = function (schema, options) {
     };
 
     schema.statics.updateIt = function (req, res, data, next) {
-        var token = req.token;
-        var current = req.current;
-        var permissions = data.permissions || [];
-        var entry = _.find(permissions, function (o) {
-            return o.user === token.user.id;
-        });
-        // TODO here user cannot remove permissions for himself
-        var actions = entry.actions || current.actions;
-        if (actions.indexOf('read') === -1) {
-            actions.push('read');
-        }
-        if (actions.indexOf('update') === -1) {
-            actions.push('update');
-        }
-        if (actions)
-        data.permissions = [{
-            user: user,
-            actions: ['read', 'update', 'delete']
-        }, {
-            group: public,
-            actions: ['read']
-        }];
         this.update(data, next);
     };
 
