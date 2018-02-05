@@ -1,10 +1,16 @@
 var log = require('logger')('mongutils');
+var nconf = require('nconf');
 var mongoose = require('mongoose');
 var _ = require('lodash');
+var maps = require('@google/maps');
 var Schema = mongoose.Schema;
 var validators = require('validators');
 var types = validators.types;
 var values = validators.values;
+
+var mapClient = maps.createClient({
+    key: nconf.get('GOOGLE_KEY')
+});
 
 module.exports = function (schema, options) {
     schema.virtual('id').get(function () {
@@ -92,4 +98,31 @@ module.exports.updatedAt = function (schema, options) {
         this.updatedAt = new Date();
         next();
     });
+};
+
+module.exports.tags = function (options) {
+    var value = {};
+    var validator = {};
+    var fields = Object.keys(options);
+    fields.forEach(function (field) {
+       var tagger = options[field];
+       value[field] = tagger.value;
+       validator[field] = tagger.validator;
+    });
+    return function (schema, options) {
+        schema.add({
+            tags: {
+                type: [{
+                    _id: false,
+                    name: String,
+                    value: String
+                }],
+                default: [],
+                server: true,
+                searchable: true,
+                validator: types.tags(validator),
+                value: values.tags(value)
+            }
+        });
+    };
 };
