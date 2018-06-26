@@ -41,7 +41,7 @@ module.exports = function (schema, options) {
                 group: Schema.Types.ObjectId,
                 actions: [String]
             }],
-            default: [],
+            hybrid: true,
             searchable: true,
             validator: types.permissions({
                 actions: ['read', 'update', 'delete']
