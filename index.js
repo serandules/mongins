@@ -25,8 +25,8 @@ module.exports = function (schema, options) {
     }
   });
 
-  schema.statics.createIt = function (req, res, data, next) {
-    this.create(data, next);
+  schema.statics.createIt = function (options, ctx, done) {
+    validators.createIt(options, ctx, done)
   };
 
   schema.statics.updateIt = function (req, res, data, next) {
