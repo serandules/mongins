@@ -7,6 +7,7 @@ var Schema = mongoose.Schema;
 var validators = require('validators');
 var types = validators.types;
 var values = validators.values;
+var hybrids = validators.hybrids;
 
 var mapClient = maps.createClient({
   key: nconf.get('GOOGLE_KEY')
@@ -41,7 +42,7 @@ module.exports = function (schema, options) {
         group: Schema.Types.ObjectId,
         actions: [String]
       }],
-      hybrid: true,
+      hybrid: hybrids.permissions(),
       searchable: true,
       validator: types.permissions({
         actions: ['read', 'update', 'delete']
