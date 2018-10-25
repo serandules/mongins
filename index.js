@@ -13,45 +13,51 @@ var mapClient = maps.createClient({
   key: nconf.get('GOOGLE_KEY')
 });
 
-module.exports = function (schema, options) {
-  schema.virtual('id').get(function () {
-    return String(this._id);
-  });
+module.exports = function (o) {
+  o = o || {};
+  return function (schema, options) {
+    schema.virtual('id').get(function () {
+      return String(this._id);
+    });
 
-  schema.set('toJSON', {
-    getters: true,
-    transform: function (doc, ret, options) {
-      delete ret._id;
-      delete ret.__v;
-    }
-  });
+    schema.set('toJSON', {
+      getters: true,
+      transform: function (doc, ret, options) {
+        delete ret._id;
+        delete ret.__v;
+        if (o.transform) {
+          o.transform(ret);
+        }
+      }
+    });
 
-  schema.statics.createIt = function (options, ctx, done) {
-    validators.createIt(options, ctx, done)
+    schema.statics.createIt = function (options, ctx, done) {
+      validators.createIt(options, ctx, done)
+    };
+
+    schema.statics.updateIt = function (req, res, data, next) {
+      this.update(data, next);
+    };
+
+    schema.add({
+      permissions: {
+        type: [{
+          _id: false,
+          user: Schema.Types.ObjectId,
+          group: Schema.Types.ObjectId,
+          actions: [String]
+        }],
+        hybrid: hybrids.permissions(),
+        searchable: true,
+        validator: types.permissions({
+          actions: ['read', 'update', 'delete']
+        }),
+        value: values.permissions({
+          actions: ['read', 'update', 'delete']
+        })
+      }
+    });
   };
-
-  schema.statics.updateIt = function (req, res, data, next) {
-    this.update(data, next);
-  };
-
-  schema.add({
-    permissions: {
-      type: [{
-        _id: false,
-        user: Schema.Types.ObjectId,
-        group: Schema.Types.ObjectId,
-        actions: [String]
-      }],
-      hybrid: hybrids.permissions(),
-      searchable: true,
-      validator: types.permissions({
-        actions: ['read', 'update', 'delete']
-      }),
-      value: values.permissions({
-        actions: ['read', 'update', 'delete']
-      })
-    }
-  });
 };
 
 module.exports.user = function (schema, options) {
