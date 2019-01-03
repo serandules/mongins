@@ -57,6 +57,15 @@ module.exports = function (o) {
         })
       }
     });
+
+    schema.add({
+      visibility: {
+        type: Object,
+        hybrid: hybrids.visibility(),
+        validator: types.visibility(),
+        value: values.visibility()
+      }
+    });
   };
 };
 
