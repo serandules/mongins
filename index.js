@@ -25,6 +25,7 @@ module.exports = function (o) {
       transform: function (doc, ret, options) {
         delete ret._id;
         delete ret.__v;
+        delete ret._;
         if (o.transform) {
           o.transform(ret);
         }
@@ -38,6 +39,15 @@ module.exports = function (o) {
     schema.statics.updateIt = function (req, res, data, next) {
       this.update(data, next);
     };
+
+    schema.add({
+      _: {
+        type: Object,
+        server: true,
+        required: true,
+        value: values._()
+      }
+    });
 
     schema.add({
       permissions: {
