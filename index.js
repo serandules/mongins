@@ -100,6 +100,7 @@ module.exports.createdAt = function (o) {
       createdAt: {
         type: Date,
         default: Date.now,
+        validator: types.date(),
         server: true,
         searchable: true,
         sortable: true,
@@ -117,6 +118,7 @@ module.exports.updatedAt = function (o) {
       updatedAt: {
         type: Date,
         default: Date.now,
+        validator: types.date(),
         server: true,
         searchable: true,
         sortable: true,
