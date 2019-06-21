@@ -2,16 +2,11 @@ var log = require('logger')('mongutils');
 var nconf = require('nconf');
 var mongoose = require('mongoose');
 var _ = require('lodash');
-var maps = require('@google/maps');
 var Schema = mongoose.Schema;
 var validators = require('validators');
 var types = validators.types;
 var values = validators.values;
 var hybrids = validators.hybrids;
-
-var mapClient = maps.createClient({
-  key: nconf.get('GOOGLE_KEY')
-});
 
 module.exports = function (o) {
   o = o || {};
@@ -48,7 +43,14 @@ module.exports = function (o) {
         value: values._()
       }
     });
+  };
+};
 
+module.exports.permissions = function (o) {
+  o = o || {};
+  o.actions = ['read', 'update', 'delete'];
+  o.server = !!o.workflow;
+  return function (schema, options) {
     schema.add({
       permissions: {
         type: [{
@@ -57,23 +59,11 @@ module.exports = function (o) {
           group: Schema.Types.ObjectId,
           actions: [String]
         }],
-        hybrid: hybrids.permissions(),
+        after: 'status',
+        hybrid: hybrids.permissions(o),
         searchable: true,
-        validator: types.permissions({
-          actions: ['read', 'update', 'delete']
-        }),
-        value: values.permissions({
-          actions: ['read', 'update', 'delete']
-        })
-      }
-    });
-
-    schema.add({
-      visibility: {
-        type: Object,
-        hybrid: hybrids.visibility(),
-        validator: types.visibility(),
-        value: values.visibility()
+        validator: types.permissions(o),
+        value: values.permissions(o)
       }
     });
   };
@@ -111,6 +101,36 @@ module.exports.createdAt = function (o) {
   };
 };
 
+module.exports.status = function (o) {
+  o = o || {};
+  return function (schema, options) {
+    schema.add({
+      status: {
+        type: String,
+        required: true,
+        searchable: true,
+        server: true,
+        value: values.status(o),
+        validator: types.status(o)
+      }
+    });
+  };
+};
+
+module.exports.visibility = function (o) {
+  o = o || {};
+  return function (schema, options) {
+    schema.add({
+      visibility: {
+        type: Object,
+        hybrid: hybrids.visibility(o),
+        validator: types.visibility(o),
+        value: values.visibility(o)
+      }
+    });
+  };
+};
+
 module.exports.updatedAt = function (o) {
   o = o || {};
   return function (schema, options) {
@@ -136,12 +156,12 @@ module.exports.updatedAt = function (o) {
   };
 };
 
-module.exports.tags = function (options) {
+module.exports.tags = function (o) {
   var value = {};
   var validator = {};
-  var fields = Object.keys(options);
+  var fields = Object.keys(o);
   fields.forEach(function (field) {
-    var tagger = options[field];
+    var tagger = o[field];
     value[field] = tagger.value;
     validator[field] = tagger.validator;
   });
