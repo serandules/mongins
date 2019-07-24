@@ -6,6 +6,7 @@ var Schema = mongoose.Schema;
 var validators = require('validators');
 var types = validators.types;
 var values = validators.values;
+var queries = validators.queries;
 var hybrids = validators.hybrids;
 
 module.exports = function (o) {
@@ -177,7 +178,10 @@ module.exports.tags = function (o) {
         server: true,
         searchable: true,
         validator: types.tags(validator),
-        value: values.tags(value)
+        value: values.tags(value),
+        query: queries.array({
+          allowed: ['name', 'value']
+        })
       }
     });
   };
