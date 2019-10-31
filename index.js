@@ -28,14 +28,6 @@ module.exports = function (o) {
       }
     });
 
-    schema.statics.createIt = function (options, ctx, done) {
-      validators.createIt(options, ctx, done)
-    };
-
-    schema.statics.updateIt = function (req, res, data, next) {
-      this.update(data, next);
-    };
-
     schema.add({
       _: {
         type: Object,
@@ -93,9 +85,24 @@ module.exports.createdAt = function (o) {
         default: Date.now,
         validator: types.date(),
         server: true,
+        value: values.createdAt()
+      }
+    });
+  };
+};
+
+module.exports.updatedAt = function (o) {
+  o = o || {};
+  return function (schema, options) {
+    schema.add({
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+        validator: types.date(),
+        server: true,
         searchable: true,
         sortable: true,
-        value: values.createdAt(),
+        value: values.updatedAt(),
         expires: o.expires
       }
     });
@@ -132,11 +139,11 @@ module.exports.visibility = function (o) {
   };
 };
 
-module.exports.updatedAt = function (o) {
+module.exports.modifiedAt = function (o) {
   o = o || {};
   return function (schema, options) {
     schema.add({
-      updatedAt: {
+      modifiedAt: {
         type: Date,
         default: Date.now,
         validator: types.date(),
@@ -147,11 +154,11 @@ module.exports.updatedAt = function (o) {
       }
     });
     schema.pre('validate', function (next) {
-      this.updatedAt = new Date();
+      this.modifiedAt = new Date();
       next();
     });
     schema.pre('update', function (next) {
-      this.updatedAt = new Date();
+      this.modifiedAt = new Date();
       next();
     });
   };
