@@ -62,18 +62,21 @@ module.exports.permissions = function (o) {
   };
 };
 
-module.exports.user = function (schema, options) {
-  schema.add({
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'users',
-      validator: types.ref(),
-      server: true,
-      required: true,
-      searchable: true,
-      value: values.user()
-    }
-  });
+module.exports.user = function (o) {
+  o = o || {};
+  return function (schema, options) {
+    schema.add({
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'users',
+        validator: types.ref(),
+        server: true,
+        required: !o.optional,
+        searchable: true,
+        value: values.user()
+      }
+    });
+  };
 };
 
 module.exports.createdAt = function (o) {
