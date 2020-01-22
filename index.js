@@ -96,17 +96,20 @@ module.exports.createdAt = function (o) {
 module.exports.updatedAt = function (o) {
   o = o || {};
   return function (schema, options) {
+    var oo = {
+      type: Date,
+      default: Date.now,
+      validator: types.date(),
+      server: true,
+      searchable: true,
+      sortable: true,
+      value: values.updatedAt()
+    };
+    if (o.expires) {
+      oo.expires = o.expires;
+    }
     schema.add({
-      updatedAt: {
-        type: Date,
-        default: Date.now,
-        validator: types.date(),
-        server: true,
-        searchable: true,
-        sortable: true,
-        value: values.updatedAt(),
-        expires: o.expires
-      }
+      updatedAt: oo
     });
   };
 };
@@ -144,16 +147,19 @@ module.exports.visibility = function (o) {
 module.exports.modifiedAt = function (o) {
   o = o || {};
   return function (schema, options) {
+    var oo = {
+      type: Date,
+      default: Date.now,
+      validator: types.date(),
+      server: true,
+      searchable: true,
+      sortable: true
+    };
+    if (o.expires) {
+      oo.expires = o.expires;
+    }
     schema.add({
-      modifiedAt: {
-        type: Date,
-        default: Date.now,
-        validator: types.date(),
-        server: true,
-        searchable: true,
-        sortable: true,
-        expires: o.expires
-      }
+      modifiedAt: oo
     });
     schema.pre('validate', function (next) {
       this.modifiedAt = new Date();
