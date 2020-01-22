@@ -21,7 +21,6 @@ module.exports = function (o) {
       transform: function (doc, ret, options) {
         delete ret._id;
         delete ret.__v;
-        delete ret._;
         if (o.transform) {
           o.transform(ret);
         }
