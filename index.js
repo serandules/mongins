@@ -26,15 +26,6 @@ module.exports = function (o) {
         }
       }
     });
-
-    schema.add({
-      _: {
-        type: Object,
-        server: true,
-        required: true,
-        value: values._()
-      }
-    });
   };
 };
 
@@ -51,6 +42,7 @@ module.exports.permissions = function (o) {
           group: Schema.Types.ObjectId,
           actions: [String]
         }],
+        required: true,
         after: 'status',
         hybrid: hybrids.permissions(o),
         searchable: true,
@@ -84,6 +76,7 @@ module.exports.createdAt = function (o) {
     schema.add({
       createdAt: {
         type: Date,
+        required: true,
         default: Date.now,
         validator: types.date(),
         server: true,
@@ -98,6 +91,7 @@ module.exports.updatedAt = function (o) {
   return function (schema, options) {
     var oo = {
       type: Date,
+      required: true,
       default: Date.now,
       validator: types.date(),
       server: true,
@@ -130,12 +124,28 @@ module.exports.status = function (o) {
   };
 };
 
+module.exports._ = function (o) {
+  o = o || {};
+  return function (schema, options) {
+    schema.add({
+      _: {
+        type: Object,
+        required: true,
+        hybrid: hybrids._(o),
+        validator: types._(o),
+        value: values._()
+      }
+    });
+  };
+};
+
 module.exports.visibility = function (o) {
   o = o || {};
   return function (schema, options) {
     schema.add({
       visibility: {
         type: Object,
+        required: true,
         hybrid: hybrids.visibility(o),
         validator: types.visibility(o),
         value: values.visibility(o)
@@ -149,6 +159,7 @@ module.exports.modifiedAt = function (o) {
   return function (schema, options) {
     var oo = {
       type: Date,
+      required: true,
       default: Date.now,
       validator: types.date(),
       server: true,
